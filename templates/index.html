@@ -447,7 +447,7 @@
             align-items: center;
             justify-content: center;
             height: 100%;
-            color: rgba(255, 255, 255, 0.7);
+            color: #e3f2fd;
             text-align: center;
             position: relative;
             z-index: 1;
@@ -456,17 +456,197 @@
         .empty-state i {
             font-size: 3rem;
             margin-bottom: 15px;
-            opacity: 0.5;
+            opacity: 0.8;
+            color: #90caf9;
         }
         
         .empty-state h4 {
             font-weight: 500;
             margin-bottom: 8px;
+            color: #ffffff;
         }
         
         .empty-state p {
             font-size: 0.9rem;
-            opacity: 0.8;
+            color: #b3e5fc;
+            opacity: 0.9;
+        }
+        
+        /* アンケートセクションのスタイル */
+        .survey-section {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.95), rgba(45, 45, 45, 0.92));
+            backdrop-filter: blur(30px);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.3),
+                0 8px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .survey-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(138, 43, 226, 0.05) 0%, 
+                transparent 25%, 
+                transparent 75%, 
+                rgba(255, 20, 147, 0.03) 100%);
+            pointer-events: none;
+        }
+        
+        .survey-header {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .survey-header h3 {
+            margin: 0 0 15px 0;
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 1.4rem;
+            letter-spacing: -0.01em;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #8A2BE2, #FF1493);
+            border-radius: 4px;
+            width: 16.67%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .survey-content {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .question-card {
+            display: none;
+            animation: fadeInUp 0.4s ease-out;
+        }
+        
+        .question-card.active {
+            display: block;
+        }
+        
+        .question-card h4 {
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .survey-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            background: rgba(26, 26, 26, 0.8);
+            color: #ffffff;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .survey-input:focus {
+            outline: none;
+            border-color: rgba(138, 43, 226, 0.6);
+            box-shadow: 0 0 0 4px rgba(138, 43, 226, 0.2);
+        }
+        
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: rgba(26, 26, 26, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .radio-option:hover {
+            background: rgba(45, 45, 45, 0.8);
+            border-color: rgba(138, 43, 226, 0.4);
+        }
+        
+        .radio-option input[type="radio"] {
+            margin-right: 12px;
+            accent-color: #8A2BE2;
+        }
+        
+        .radio-option span {
+            color: #ffffff;
+            font-weight: 500;
+        }
+        
+        .radio-option input[type="radio"]:checked + span {
+            color: #FF1493;
+        }
+        
+        .next-btn, .submit-btn {
+            background: linear-gradient(135deg, #8A2BE2, #FF1493);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
+        }
+        
+        .next-btn:hover, .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.5);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         @media (max-width: 768px) {
@@ -679,33 +859,135 @@
         </div>
         
         <div class="content-wrapper">
-            <!-- チャットセクション -->
-            <div class="chat-section">
-                <div class="chat-header">
-                    <h3><i class="fas fa-comments me-2"></i>チャット</h3>
+            <!-- アンケートセクション -->
+            <div class="survey-section">
+                <div class="survey-header">
+                    <h3><i class="fas fa-clipboard-list me-2"></i>旅行プラン作成アンケート</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <span class="progress-text" id="progress-text">1 / 6</span>
                 </div>
                 
-                <div class="chat-messages" id="chat-messages">
-                    <div class="message ai-message">
-                        <div class="avatar ai-avatar">
-                            <i class="fas fa-robot"></i>
+                <div class="survey-content" id="survey-content">
+                    <!-- 質問1: 出発地 -->
+                    <div class="question-card active" data-question="1">
+                        <h4>出発地はどちらですか？</h4>
+                        <input type="text" id="origin" placeholder="例：東京駅、新宿、渋谷" class="survey-input" />
+                        <button class="next-btn" onclick="nextQuestion()">次へ</button>
+                    </div>
+                    
+                    <!-- 質問2: 目的地 -->
+                    <div class="question-card" data-question="2">
+                        <h4>目的地はどちらですか？</h4>
+                        <input type="text" id="destination" placeholder="例：鎌倉、箱根、富士山" class="survey-input" />
+                        <button class="next-btn" onclick="nextQuestion()">次へ</button>
+                    </div>
+                    
+                    <!-- 質問3: 交通手段 -->
+                    <div class="question-card" data-question="3">
+                        <h4>希望する交通手段を選択してください</h4>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="transport" value="train" />
+                                <span>電車</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="transport" value="car" />
+                                <span>車</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="transport" value="bus" />
+                                <span>バス</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="transport" value="walking" />
+                                <span>徒歩</span>
+                            </label>
                         </div>
-                        <div class="message-content">
-                            こんにちは！出発地と目的地を教えてください。最適なルートと、目的地周辺のおすすめ飲食店をご提案します！
+                        <button class="next-btn" onclick="nextQuestion()">次へ</button>
+                    </div>
+                    
+                    <!-- 質問4: 予算 -->
+                    <div class="question-card" data-question="4">
+                        <h4>食事の予算はどの程度ですか？</h4>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="budget" value="1000" />
+                                <span>〜1,000円</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="budget" value="3000" />
+                                <span>1,000〜3,000円</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="budget" value="5000" />
+                                <span>3,000〜5,000円</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="budget" value="10000" />
+                                <span>5,000円以上</span>
+                            </label>
                         </div>
+                        <button class="next-btn" onclick="nextQuestion()">次へ</button>
+                    </div>
+                    
+                    <!-- 質問5: 到着時間 -->
+                    <div class="question-card" data-question="5">
+                        <h4>目的地への到着希望時間は？</h4>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="time" value="morning" />
+                                <span>午前中（9:00〜12:00）</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="time" value="afternoon" />
+                                <span>午後（12:00〜17:00）</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="time" value="evening" />
+                                <span>夕方以降（17:00〜）</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="time" value="flexible" />
+                                <span>特に指定なし</span>
+                            </label>
+                        </div>
+                        <button class="next-btn" onclick="nextQuestion()">次へ</button>
+                    </div>
+                    
+                    <!-- 質問6: 食事の好み -->
+                    <div class="question-card" data-question="6">
+                        <h4>どんな料理がお好みですか？</h4>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="food" value="japanese" />
+                                <span>和食</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="food" value="western" />
+                                <span>洋食</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="food" value="chinese" />
+                                <span>中華</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="food" value="cafe" />
+                                <span>カフェ・軽食</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="food" value="any" />
+                                <span>特に指定なし</span>
+                            </label>
+                        </div>
+                        <button class="submit-btn" onclick="submitSurvey()">旅行プランを作成</button>
                     </div>
                 </div>
                 
-                <div class="loading" id="loading">
+                <div class="loading" id="loading" style="display: none;">
                     <i class="fas fa-sparkles"></i>
                     <div class="loading-text">AIが素敵な旅行ルートを生成中...</div>
-                </div>
-                
-                <div class="input-section">
-                    <input type="text" id="user-input" placeholder="例：新宿から鎌倉に行きたいです" />
-                    <button class="send-btn" onclick="sendMessage()">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
                 </div>
             </div>
             
@@ -721,8 +1003,8 @@
                 <div class="map-container" id="map-container">
                     <div class="empty-state">
                         <i class="fas fa-map"></i>
-                        <h4>旅行先を教えてください</h4>
-                        <p>チャットで目的地や要望をお聞かせください。AIがおすすめのルートを地図に表示します。</p>
+                        <h4>アンケートにお答えください</h4>
+                        <p>左側のアンケートにお答えいただくと、AIが最適な旅行ルートを地図に表示します。</p>
                     </div>
                     <iframe id="map-frame" src="about:blank" style="display: none;"></iframe>
                 </div>
@@ -747,8 +1029,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const chatMessages = document.getElementById('chat-messages');
-        const userInput = document.getElementById('user-input');
         const mapFrame = document.getElementById('map-frame');
         const mapContainer = document.getElementById('map-container');
         const infoPanels = document.getElementById('info-panels');
@@ -758,111 +1038,123 @@
         const routePanel = document.getElementById('route-panel');
         const shareBtn = document.getElementById('share-btn');
         const loading = document.getElementById('loading');
+        const progressFill = document.getElementById('progress-fill');
+        const progressText = document.getElementById('progress-text');
 
+        let currentQuestion = 1;
+        let surveyData = {};
         let currentTravelData = null;
 
-        userInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
+        // アンケート進行管理
+        function nextQuestion() {
+            // 現在の質問の回答を取得
+            const currentCard = document.querySelector(`[data-question="${currentQuestion}"]`);
+            let isValid = false;
+            
+            if (currentQuestion === 1) {
+                const origin = document.getElementById('origin').value.trim();
+                if (origin) {
+                    surveyData.origin = origin;
+                    isValid = true;
+                }
+            } else if (currentQuestion === 2) {
+                const destination = document.getElementById('destination').value.trim();
+                if (destination) {
+                    surveyData.destination = destination;
+                    isValid = true;
+                }
+            } else {
+                // ラジオボタンの選択肢
+                const radioInputs = currentCard.querySelectorAll('input[type="radio"]');
+                for (let radio of radioInputs) {
+                    if (radio.checked) {
+                        surveyData[radio.name] = radio.value;
+                        isValid = true;
+                        break;
+                    }
+                }
             }
-        });
-
-        async function sendMessage() {
-            const message = userInput.value.trim();
-            if (!message) return;
-
-            // ユーザーメッセージを表示
-            appendMessage(message, 'user');
-            userInput.value = '';
+            
+            if (!isValid) {
+                alert('選択肢を選んでください。');
+                return;
+            }
+            
+            // 現在の質問を非表示
+            currentCard.classList.remove('active');
+            
+            // 次の質問を表示
+            currentQuestion++;
+            if (currentQuestion <= 6) {
+                document.querySelector(`[data-question="${currentQuestion}"]`).classList.add('active');
+                updateProgress();
+            }
+        }
+        
+        function updateProgress() {
+            const percentage = (currentQuestion / 6) * 100;
+            progressFill.style.width = percentage + '%';
+            progressText.textContent = `${currentQuestion} / 6`;
+        }
+        
+        async function submitSurvey() {
+            // 最後の質問の回答を取得
+            const currentCard = document.querySelector(`[data-question="${currentQuestion}"]`);
+            const radioInputs = currentCard.querySelectorAll('input[type="radio"]');
+            let isValid = false;
+            
+            for (let radio of radioInputs) {
+                if (radio.checked) {
+                    surveyData[radio.name] = radio.value;
+                    isValid = true;
+                    break;
+                }
+            }
+            
+            if (!isValid) {
+                alert('選択肢を選んでください。');
+                return;
+            }
             
             // ローディング表示
             loading.style.display = 'block';
-
+            currentCard.style.display = 'none';
+            
             try {
-                const response = await fetch('/chat', {
+                // Difyまたはローカル処理にデータを送信
+                const response = await fetch('/survey', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ message: message })
+                    body: JSON.stringify(surveyData)
                 });
-
+                
                 const data = await response.json();
-                console.log('Received data:', data);
                 
                 // ローディング非表示
                 loading.style.display = 'none';
                 
                 if (data.error) {
-                    appendMessage('申し訳ありません。エラーが発生しました。', 'ai');
+                    alert('エラーが発生しました: ' + data.error);
                     return;
                 }
-
-                // AIの応答を表示
-                appendMessage(data.response, 'ai');
-
+                
                 // 旅行データを保存
                 currentTravelData = data;
-
+                
                 // 地図と情報を更新
-                console.log('Checking map_data:', data.map_data);
                 if (data.map_data) {
                     updateMapAndInfo(data);
-                } else {
-                    console.log('No map_data in response');
                 }
                 
-                // 会話状態をログ出力（デバッグ用）
-                if (data.conversation_state) {
-                    console.log('Conversation state:', data.conversation_state);
-                }
-
             } catch (error) {
                 loading.style.display = 'none';
                 console.error('Error:', error);
-                appendMessage('申し訳ありません。エラーが発生しました。', 'ai');
+                alert('申し訳ありません。エラーが発生しました。');
             }
         }
 
-        function appendMessage(message, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}-message`;
-            messageDiv.style.opacity = '0';
-            messageDiv.style.transform = 'translateY(20px)';
-            
-            const avatar = document.createElement('div');
-            avatar.className = `avatar ${sender}-avatar`;
-            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
-            
-            const content = document.createElement('div');
-            content.className = 'message-content';
-            content.textContent = message;
-            
-            if (sender === 'user') {
-                messageDiv.appendChild(content);
-                messageDiv.appendChild(avatar);
-            } else {
-                messageDiv.appendChild(avatar);
-                messageDiv.appendChild(content);
-            }
-            
-            chatMessages.appendChild(messageDiv);
-            
-            // アニメーション効果
-            setTimeout(() => {
-                messageDiv.style.opacity = '1';
-                messageDiv.style.transform = 'translateY(0)';
-                messageDiv.style.transition = 'all 0.4s ease-out';
-            }, 10);
-            
-            // 自動スクロール（スムーズ）
-            setTimeout(() => {
-                chatMessages.scrollTo({
-                    top: chatMessages.scrollHeight,
-                    behavior: 'smooth'
-                });
-            }, 200);
-        }
 
         function updateMapAndInfo(data) {
             console.log('updateMapAndInfo called with:', data);

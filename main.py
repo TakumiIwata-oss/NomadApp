@@ -251,6 +251,175 @@ def generate_next_question(state):
 def index():
     return render_template('index.html')
 
+@app.route('/survey', methods=['POST'])
+def survey():
+    survey_data = request.json
+    
+    try:
+        # Dify APIへのリクエスト準備
+        dify_url = os.getenv('DIFY_API_URL')
+        dify_api_key = os.getenv('DIFY_API_KEY')
+        
+        if dify_url and dify_api_key:
+            # Difyに送信するデータを構築
+            dify_payload = {
+                "inputs": {
+                    "origin": survey_data.get('origin', ''),
+                    "destination": survey_data.get('destination', ''),
+                    "transport": survey_data.get('transport', ''),
+                    "budget": survey_data.get('budget', ''),
+                    "time": survey_data.get('time', ''),
+                    "food": survey_data.get('food', '')
+                },
+                "response_mode": "blocking",
+                "user": "nomad-user"
+            }
+            
+            # Dify APIにリクエスト
+            headers = {
+                'Authorization': f'Bearer {dify_api_key}',
+                'Content-Type': 'application/json'
+            }
+            
+            dify_response = requests.post(dify_url, json=dify_payload, headers=headers)
+            
+            if dify_response.status_code == 200:
+                dify_data = dify_response.json()
+                ai_message = dify_data.get('data', {}).get('outputs', {}).get('text', '')
+            else:
+                # Dify失敗時はローカル処理にフォールバック
+                ai_message = generate_local_response(survey_data)
+        else:
+            # Dify設定がない場合はローカル処理
+            ai_message = generate_local_response(survey_data)
+        
+        # 旅行情報を抽出
+        travel_locations = extract_travel_info_from_ai_response(ai_message)
+        
+        map_data = None
+        restaurants_data = []
+        route_data = None
+        
+        # Google Maps APIキーを取得
+        api_key = os.getenv('GOOGLE_MAPS_API_KEY')
+        
+        if travel_locations and api_key:
+            resolved_locations = []
+            all_restaurants = []
+            
+            # 各場所の座標を取得
+            for location_info in travel_locations:
+                location_query = location_info['search_query']
+                places = get_place_suggestions(location_query, "35.6762,139.6503", api_key)
+                
+                if places:
+                    place = places[0]
+                    resolved_location = {
+                        "name": location_info["name"],
+                        "description": location_info["description"],
+                        "lat": place["geometry"]["location"]["lat"],
+                        "lng": place["geometry"]["location"]["lng"],
+                        "address": place.get("formatted_address", ""),
+                        "place_id": place["place_id"]
+                    }
+                    resolved_locations.append(resolved_location)
+                    
+                    # 各場所周辺の飲食店を検索
+                    restaurants = get_restaurants_near_location(
+                        resolved_location["lat"], 
+                        resolved_location["lng"], 
+                        api_key
+                    )
+                    all_restaurants.extend(restaurants)
+            
+            # 重複する飲食店を除去
+            unique_restaurants = []
+            seen_place_ids = set()
+            for restaurant in all_restaurants:
+                if restaurant["place_id"] not in seen_place_ids:
+                    unique_restaurants.append(restaurant)
+                    seen_place_ids.add(restaurant["place_id"])
+            
+            # 評価順でソート
+            unique_restaurants.sort(key=lambda x: x.get("rating", 0), reverse=True)
+            restaurants_data = unique_restaurants[:8]
+            
+            # ルートを生成
+            if len(resolved_locations) >= 2:
+                origin = f"{resolved_locations[0]['lat']},{resolved_locations[0]['lng']}"
+                destination = f"{resolved_locations[-1]['lat']},{resolved_locations[-1]['lng']}"
+                route_polyline = get_route(origin, destination, api_key)
+                if route_polyline:
+                    route_data = {
+                        "polyline": route_polyline,
+                        "origin": resolved_locations[0]["name"],
+                        "destination": resolved_locations[-1]["name"]
+                    }
+            
+            # Google Maps埋め込みURLを生成
+            if resolved_locations:
+                google_maps_url = create_google_maps_url(resolved_locations, restaurants_data, 
+                                                       route_data["polyline"] if route_data else None)
+                
+                if google_maps_url:
+                    map_data = {
+                        "url": google_maps_url,
+                        "locations": resolved_locations,
+                        "restaurants": restaurants_data,
+                        "route": route_data
+                    }
+        
+        return jsonify({
+            "response": ai_message,
+            "map_data": map_data,
+            "locations": map_data["locations"] if map_data else [],
+            "restaurants": restaurants_data,
+            "route": route_data
+        })
+    
+    except Exception as e:
+        return jsonify({
+            "error": str(e)
+        }), 500
+
+def generate_local_response(survey_data):
+    """ローカルでの旅行プラン生成（Dify失敗時のフォールバック）"""
+    # 簡単なテンプレート応答
+    origin = survey_data.get('origin', '出発地')
+    destination = survey_data.get('destination', '目的地')
+    transport = survey_data.get('transport', '電車')
+    
+    transport_map = {
+        'train': '電車',
+        'car': '車',
+        'bus': 'バス',
+        'walking': '徒歩'
+    }
+    
+    transport_ja = transport_map.get(transport, transport)
+    
+    message = f"""
+    {origin}から{destination}への{transport_ja}を使った旅行プランをご提案します。
+
+    ```json
+    {{
+      "locations": [
+        {{
+          "name": "{destination}",
+          "description": "魅力的な観光地",
+          "search_query": "{destination}"
+        }}
+      ],
+      "route_summary": "{origin}から{destination}まで{transport_ja}で移動",
+      "travel_info": "{transport_ja}での移動時間は約1-2時間を予定"
+    }}
+    ```
+    
+    素敵な旅行をお楽しみください！
+    """
+    
+    return message
+
 @app.route('/chat', methods=['POST'])
 def chat():
     user_message = request.json.get('message', '')
