@@ -638,10 +638,33 @@
             box-shadow: 0 8px 25px rgba(138, 43, 226, 0.5);
         }
         
+        .error-message {
+            color: #ff4757;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            margin-bottom: 16px;
+            padding: 8px 12px;
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            border-radius: 8px;
+            animation: errorSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes errorSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(10px);
             }
             to {
                 opacity: 1;
@@ -862,7 +885,7 @@
             <!-- アンケートセクション -->
             <div class="survey-section">
                 <div class="survey-header">
-                    <h3><i class="fas fa-clipboard-list me-2"></i>旅行プラン作成アンケート</h3>
+                    <h3><i class="fas fa-clipboard-list me-2"></i>旅行プランを作成</h3>
                     <div class="progress-bar">
                         <div class="progress-fill" id="progress-fill"></div>
                     </div>
@@ -874,6 +897,7 @@
                     <div class="question-card active" data-question="1">
                         <h4>出発地はどちらですか？</h4>
                         <input type="text" id="origin" placeholder="例：東京駅、新宿、渋谷" class="survey-input" />
+                        <div class="error-message" id="origin-error" style="display: none;">出発地が入力されていません</div>
                         <button class="next-btn" onclick="nextQuestion()">次へ</button>
                     </div>
                     
@@ -881,6 +905,7 @@
                     <div class="question-card" data-question="2">
                         <h4>目的地はどちらですか？</h4>
                         <input type="text" id="destination" placeholder="例：鎌倉、箱根、富士山" class="survey-input" />
+                        <div class="error-message" id="destination-error" style="display: none;">目的地が入力されていません</div>
                         <button class="next-btn" onclick="nextQuestion()">次へ</button>
                     </div>
                     
@@ -1045,6 +1070,22 @@
         let surveyData = {};
         let currentTravelData = null;
 
+        // エラーメッセージを非表示にする関数
+        function hideErrorMessage(errorId) {
+            const errorElement = document.getElementById(errorId);
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+        }
+        
+        // エラーメッセージを表示する関数
+        function showErrorMessage(errorId) {
+            const errorElement = document.getElementById(errorId);
+            if (errorElement) {
+                errorElement.style.display = 'block';
+            }
+        }
+
         // アンケート進行管理
         function nextQuestion() {
             // 現在の質問の回答を取得
@@ -1052,16 +1093,24 @@
             let isValid = false;
             
             if (currentQuestion === 1) {
+                hideErrorMessage('origin-error');
                 const origin = document.getElementById('origin').value.trim();
                 if (origin) {
                     surveyData.origin = origin;
                     isValid = true;
+                } else {
+                    showErrorMessage('origin-error');
+                    return;
                 }
             } else if (currentQuestion === 2) {
+                hideErrorMessage('destination-error');
                 const destination = document.getElementById('destination').value.trim();
                 if (destination) {
                     surveyData.destination = destination;
                     isValid = true;
+                } else {
+                    showErrorMessage('destination-error');
+                    return;
                 }
             } else {
                 // ラジオボタンの選択肢
@@ -1073,11 +1122,11 @@
                         break;
                     }
                 }
-            }
-            
-            if (!isValid) {
-                alert('選択肢を選んでください。');
-                return;
+                
+                if (!isValid) {
+                    alert('選択肢を選んでください。');
+                    return;
+                }
             }
             
             // 現在の質問を非表示
