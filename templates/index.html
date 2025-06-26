@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nomad</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 30%, #1a0f2e 50%, #1a1a1a 70%, #000000 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(138, 43, 226, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(75, 0, 130, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .main-container {
+            min-height: 100vh;
+            padding: 30px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .app-header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+            position: relative;
+        }
+        
+        .app-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.2rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 30%, #e3f2fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            text-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .app-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ffffff, transparent);
+            opacity: 0.6;
+        }
+        
+        .app-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .content-wrapper {
+            max-width: 1500px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            height: calc(100vh - 220px);
+        }
+        
+        .chat-section {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.95), rgba(45, 45, 45, 0.92));
+            backdrop-filter: blur(30px);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.3),
+                0 8px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(138, 43, 226, 0.05) 0%, 
+                transparent 25%, 
+                transparent 75%, 
+                rgba(255, 20, 147, 0.03) 100%);
+            pointer-events: none;
+        }
+        
+        .chat-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .chat-header h3 {
+            margin: 0;
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 1.4rem;
+            letter-spacing: -0.01em;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            animation: messageSlideIn 0.4s ease-out;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message-content {
+            max-width: 75%;
+            padding: 16px 20px;
+            border-radius: 22px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .message-content:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-message {
+            justify-content: flex-end;
+        }
+        
+        .user-message .message-content {
+            background: linear-gradient(135deg, #8A2BE2 0%, #FF1493 100%);
+            color: white;
+            margin-left: auto;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4);
+        }
+        
+        .ai-message .message-content {
+            background: linear-gradient(145deg, #2d2d2d 0%, #404040 100%);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+        }
+        
+        .user-avatar {
+            background: linear-gradient(135deg, #8A2BE2, #FF1493);
+            color: white;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4);
+        }
+        
+        .ai-avatar {
+            background: linear-gradient(135deg, #1a1a1a, #404040);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .input-section {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .input-section input {
+            flex: 1;
+            padding: 16px 24px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            font-size: 0.95rem;
+            outline: none;
+            background: rgba(26, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            color: #ffffff;
+        }
+        
+        .input-section input:focus {
+            border-color: rgba(138, 43, 226, 0.6);
+            background: rgba(26, 26, 26, 0.95);
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.3),
+                0 0 0 4px rgba(138, 43, 226, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .input-section input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 400;
+        }
+        
+        .send-btn {
+            width: 52px;
+            height: 52px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8A2BE2, #FF1493);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
+            font-size: 18px;
+        }
+        
+        .send-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.5);
+        }
+
+        .send-btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+        
+        .map-section {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.95), rgba(45, 45, 45, 0.92));
+            backdrop-filter: blur(30px);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.3),
+                0 8px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(138, 43, 226, 0.05) 0%, 
+                transparent 25%, 
+                transparent 75%, 
+                rgba(255, 20, 147, 0.03) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .map-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .map-header h3 {
+            margin: 0;
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 1.4rem;
+            letter-spacing: -0.01em;
+        }
+        
+        .map-container {
+            flex: 1;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+            min-height: 400px;
+            z-index: 1;
+        }
+        
+        #map-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+            position: relative;
+            z-index: 2;
+            background: white;
+        }
+        
+        .info-panels {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .info-panel {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #e1e5e9;
+        }
+        
+        .info-panel h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #6c757d;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .location-item, .restaurant-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .location-item i, .restaurant-item i {
+            color: #667eea;
+            width: 16px;
+        }
+        
+        .restaurant-rating {
+            background: #ffc107;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: auto;
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h4 {
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .app-title {
+                font-size: 2rem;
+            }
+            
+            .info-panels {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .loading i {
+            font-size: 24px;
+            color: #667eea;
+            animation: spin 2s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        .loading-text {
+            color: #6c757d;
+            font-weight: 500;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        .share-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .info-panels {
+            margin-top: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-panels.has-route {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        @media (max-width: 768px) {
+            .info-panels.has-route {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .info-panel {
+            background: linear-gradient(145deg, rgba(26, 26, 26, 0.8), rgba(45, 45, 45, 0.8));
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .info-panel:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info-panel h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0 0 16px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .location-item, .restaurant-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .location-item:hover, .restaurant-item:hover {
+            transform: translateX(5px);
+        }
+
+        .location-item:last-child, .restaurant-item:last-child {
+            border-bottom: none;
+        }
+        
+        .location-item i, .restaurant-item i {
+            color: #667eea;
+            width: 18px;
+            font-size: 14px;
+        }
+        
+        .restaurant-rating {
+            background: linear-gradient(135deg, #ffc107, #ff8f00);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: auto;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+        }
+
+        .route-item {
+            padding: 16px 0;
+        }
+
+        .route-details {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .route-point {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .route-point.start i {
+            color: #28a745;
+            font-size: 16px;
+        }
+
+        .route-point.end i {
+            color: #dc3545;
+            font-size: 16px;
+        }
+
+        .route-arrow {
+            text-align: center;
+            margin: 4px 0;
+        }
+
+        .route-arrow i {
+            color: #667eea;
+            font-size: 18px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-5px);
+            }
+            60% {
+                transform: translateY(-3px);
+            }
+        }
+
+        .route-point span {
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="app-header">
+            <h1 class="app-title">Nomad</h1>
+            <p class="app-subtitle">出発地から目的地まで、AIがルートを提案します</p>
+        </div>
+        
+        <div class="content-wrapper">
+            <!-- チャットセクション -->
+            <div class="chat-section">
+                <div class="chat-header">
+                    <h3><i class="fas fa-comments me-2"></i>チャット</h3>
+                </div>
+                
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message ai-message">
+                        <div class="avatar ai-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            こんにちは！出発地と目的地を教えてください。最適なルートと、目的地周辺のおすすめ飲食店をご提案します！
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="loading" id="loading">
+                    <i class="fas fa-sparkles"></i>
+                    <div class="loading-text">AIが素敵な旅行ルートを生成中...</div>
+                </div>
+                
+                <div class="input-section">
+                    <input type="text" id="user-input" placeholder="例：新宿から鎌倉に行きたいです" />
+                    <button class="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 地図・情報セクション -->
+            <div class="map-section">
+                <div class="map-header">
+                    <h3><i class="fas fa-map-marked-alt me-2"></i>旅行ルート</h3>
+                    <button class="share-btn" onclick="shareRoute()" style="display: none;" id="share-btn">
+                        <i class="fas fa-share-alt me-1"></i>共有
+                    </button>
+                </div>
+                
+                <div class="map-container" id="map-container">
+                    <div class="empty-state">
+                        <i class="fas fa-map"></i>
+                        <h4>旅行先を教えてください</h4>
+                        <p>チャットで目的地や要望をお聞かせください。AIがおすすめのルートを地図に表示します。</p>
+                    </div>
+                    <iframe id="map-frame" src="about:blank" style="display: none;"></iframe>
+                </div>
+                
+                <div class="info-panels" id="info-panels" style="display: none;">
+                    <div class="info-panel" id="route-panel" style="display: none;">
+                        <h4><i class="fas fa-route me-1"></i>旅行ルート</h4>
+                        <div id="route-info"></div>
+                    </div>
+                    <div class="info-panel">
+                        <h4><i class="fas fa-map-marker-alt me-1"></i>観光スポット</h4>
+                        <div id="locations-list"></div>
+                    </div>
+                    <div class="info-panel">
+                        <h4><i class="fas fa-utensils me-1"></i>おすすめ飲食店</h4>
+                        <div id="restaurants-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const mapFrame = document.getElementById('map-frame');
+        const mapContainer = document.getElementById('map-container');
+        const infoPanels = document.getElementById('info-panels');
+        const locationsListEl = document.getElementById('locations-list');
+        const restaurantsListEl = document.getElementById('restaurants-list');
+        const routeInfoEl = document.getElementById('route-info');
+        const routePanel = document.getElementById('route-panel');
+        const shareBtn = document.getElementById('share-btn');
+        const loading = document.getElementById('loading');
+
+        let currentTravelData = null;
+
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // ユーザーメッセージを表示
+            appendMessage(message, 'user');
+            userInput.value = '';
+            
+            // ローディング表示
+            loading.style.display = 'block';
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+
+                const data = await response.json();
+                console.log('Received data:', data);
+                
+                // ローディング非表示
+                loading.style.display = 'none';
+                
+                if (data.error) {
+                    appendMessage('申し訳ありません。エラーが発生しました。', 'ai');
+                    return;
+                }
+
+                // AIの応答を表示
+                appendMessage(data.response, 'ai');
+
+                // 旅行データを保存
+                currentTravelData = data;
+
+                // 地図と情報を更新
+                console.log('Checking map_data:', data.map_data);
+                if (data.map_data) {
+                    updateMapAndInfo(data);
+                } else {
+                    console.log('No map_data in response');
+                }
+                
+                // 会話状態をログ出力（デバッグ用）
+                if (data.conversation_state) {
+                    console.log('Conversation state:', data.conversation_state);
+                }
+
+            } catch (error) {
+                loading.style.display = 'none';
+                console.error('Error:', error);
+                appendMessage('申し訳ありません。エラーが発生しました。', 'ai');
+            }
+        }
+
+        function appendMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            messageDiv.style.opacity = '0';
+            messageDiv.style.transform = 'translateY(20px)';
+            
+            const avatar = document.createElement('div');
+            avatar.className = `avatar ${sender}-avatar`;
+            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.textContent = message;
+            
+            if (sender === 'user') {
+                messageDiv.appendChild(content);
+                messageDiv.appendChild(avatar);
+            } else {
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(content);
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            
+            // アニメーション効果
+            setTimeout(() => {
+                messageDiv.style.opacity = '1';
+                messageDiv.style.transform = 'translateY(0)';
+                messageDiv.style.transition = 'all 0.4s ease-out';
+            }, 10);
+            
+            // 自動スクロール（スムーズ）
+            setTimeout(() => {
+                chatMessages.scrollTo({
+                    top: chatMessages.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 200);
+        }
+
+        function updateMapAndInfo(data) {
+            console.log('updateMapAndInfo called with:', data);
+            
+            // Empty stateをフェードアウト
+            const emptyState = mapContainer.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.style.transition = 'opacity 0.5s ease-out';
+                emptyState.style.opacity = '0';
+                setTimeout(() => {
+                    emptyState.style.display = 'none';
+                }, 500);
+            }
+            
+            // 地図を表示
+            if (data.map_data && data.map_data.url) {
+                console.log('Loading map from:', data.map_data.url);
+                mapFrame.style.opacity = '0';
+                mapFrame.style.display = 'block';
+                mapFrame.style.position = 'relative';
+                mapFrame.style.zIndex = '1';
+                mapFrame.src = data.map_data.url;
+                
+                // 地図読み込み完了後にフェードイン
+                mapFrame.onload = function() {
+                    console.log('Map loaded successfully');
+                    mapFrame.style.transition = 'opacity 0.5s ease-in';
+                    mapFrame.style.opacity = '1';
+                };
+                
+                // フォールバック：タイムアウト後に表示
+                setTimeout(() => {
+                    if (mapFrame.style.opacity !== '1') {
+                        mapFrame.style.transition = 'opacity 0.5s ease-in';
+                        mapFrame.style.opacity = '1';
+                    }
+                }, 1000);
+            } else {
+                console.log('No map data available');
+            }
+
+            // ルート情報を表示
+            if (data.route) {
+                routeInfoEl.innerHTML = '';
+                
+                const routeItem = document.createElement('div');
+                routeItem.className = 'route-item';
+                routeItem.style.opacity = '0';
+                routeItem.style.transform = 'translateY(-10px)';
+                routeItem.innerHTML = `
+                    <div class="route-details">
+                        <div class="route-point start">
+                            <i class="fas fa-play-circle"></i>
+                            <span>出発: ${data.route.origin}</span>
+                        </div>
+                        <div class="route-arrow">
+                            <i class="fas fa-arrow-down"></i>
+                        </div>
+                        <div class="route-point end">
+                            <i class="fas fa-flag-checkered"></i>
+                            <span>到着: ${data.route.destination}</span>
+                        </div>
+                    </div>
+                `;
+                routeInfoEl.appendChild(routeItem);
+                
+                // ルートパネルを表示
+                routePanel.style.display = 'block';
+                infoPanels.classList.add('has-route');
+                
+                // アニメーション
+                setTimeout(() => {
+                    routeItem.style.transition = 'all 0.4s ease-out';
+                    routeItem.style.opacity = '1';
+                    routeItem.style.transform = 'translateY(0)';
+                }, 500);
+            }
+
+            // 観光スポット一覧を更新（アニメーション付き）
+            if (data.locations && data.locations.length > 0) {
+                locationsListEl.innerHTML = '';
+                data.locations.forEach((location, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'location-item';
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateX(-20px)';
+                    item.innerHTML = `
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${location.name}</span>
+                    `;
+                    locationsListEl.appendChild(item);
+                    
+                    // 段階的にアニメーション
+                    setTimeout(() => {
+                        item.style.transition = 'all 0.4s ease-out';
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateX(0)';
+                    }, 800 + (index * 100));
+                });
+            }
+
+            // 飲食店一覧を更新（アニメーション付き）
+            if (data.restaurants && data.restaurants.length > 0) {
+                restaurantsListEl.innerHTML = '';
+                data.restaurants.forEach((restaurant, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'restaurant-item';
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateX(-20px)';
+                    item.innerHTML = `
+                        <i class="fas fa-utensils"></i>
+                        <span>${restaurant.name}</span>
+                        <span class="restaurant-rating">★${restaurant.rating}</span>
+                    `;
+                    restaurantsListEl.appendChild(item);
+                    
+                    // 段階的にアニメーション
+                    setTimeout(() => {
+                        item.style.transition = 'all 0.4s ease-out';
+                        item.style.opacity = '1';
+                        item.style.transform = 'translateX(0)';
+                    }, 1000 + (index * 100));
+                });
+            }
+
+            // 情報パネルと共有ボタンをフェードイン
+            setTimeout(() => {
+                infoPanels.style.opacity = '0';
+                infoPanels.style.display = 'grid';
+                infoPanels.style.transition = 'opacity 0.5s ease-in';
+                shareBtn.style.opacity = '0';
+                shareBtn.style.display = 'block';
+                shareBtn.style.transition = 'opacity 0.5s ease-in';
+                
+                setTimeout(() => {
+                    infoPanels.style.opacity = '1';
+                    shareBtn.style.opacity = '1';
+                }, 50);
+            }, 700);
+        }
+
+        function shareRoute() {
+            if (!currentTravelData) return;
+
+            // 共有用のテキストを生成
+            let shareText = '🌟 AI生成の旅行ルート 🌟\n\n';
+            
+            if (currentTravelData.route) {
+                shareText += `🚶‍♀️ ルート: ${currentTravelData.route.origin} → ${currentTravelData.route.destination}\n\n`;
+            }
+            
+            if (currentTravelData.locations && currentTravelData.locations.length > 0) {
+                shareText += '📍 観光スポット:\n';
+                currentTravelData.locations.forEach(location => {
+                    shareText += `• ${location.name}\n`;
+                });
+                shareText += '\n';
+            }
+
+            if (currentTravelData.restaurants && currentTravelData.restaurants.length > 0) {
+                shareText += '🍽️ おすすめ飲食店:\n';
+                currentTravelData.restaurants.slice(0, 3).forEach(restaurant => {
+                    shareText += `• ${restaurant.name} (★${restaurant.rating})\n`;
+                });
+                shareText += '\n';
+            }
+
+            shareText += '#旅行 #AI旅行プラン #Instagram映え';
+
+            // Web Share APIが利用可能な場合
+            if (navigator.share) {
+                navigator.share({
+                    title: 'AI生成旅行ルート',
+                    text: shareText,
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                // フォールバック：クリップボードにコピー
+                navigator.clipboard.writeText(shareText).then(() => {
+                    alert('旅行ルートがクリップボードにコピーされました！SNSでシェアしてください✨');
+                }).catch(() => {
+                    // さらなるフォールバック：テキストエリアを表示
+                    const textarea = document.createElement('textarea');
+                    textarea.value = shareText;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    alert('旅行ルートがクリップボードにコピーされました！SNSでシェアしてください✨');
+                });
+            }
+        }
+    </script>
+</body>
+</html> 
