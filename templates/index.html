@@ -930,6 +930,7 @@
                                 <span>徒歩</span>
                             </label>
                         </div>
+                        <div class="error-message" id="transport-error" style="display: none;">交通手段を選択してください</div>
                         <button class="next-btn" onclick="nextQuestion()">次へ</button>
                     </div>
                     
@@ -954,6 +955,7 @@
                                 <span>5,000円以上</span>
                             </label>
                         </div>
+                        <div class="error-message" id="budget-error" style="display: none;">予算を選択してください</div>
                         <button class="next-btn" onclick="nextQuestion()">次へ</button>
                     </div>
                     
@@ -978,6 +980,7 @@
                                 <span>特に指定なし</span>
                             </label>
                         </div>
+                        <div class="error-message" id="time-error" style="display: none;">到着時間を選択してください</div>
                         <button class="next-btn" onclick="nextQuestion()">次へ</button>
                     </div>
                     
@@ -1006,6 +1009,7 @@
                                 <span>特に指定なし</span>
                             </label>
                         </div>
+                        <div class="error-message" id="food-error" style="display: none;">料理の好みを選択してください</div>
                         <button class="submit-btn" onclick="submitSurvey()">旅行プランを作成</button>
                     </div>
                 </div>
@@ -1115,6 +1119,13 @@
             } else {
                 // ラジオボタンの選択肢
                 const radioInputs = currentCard.querySelectorAll('input[type="radio"]');
+                const radioName = radioInputs[0]?.name; // ラジオボタンのname属性を取得
+                
+                // まずエラーメッセージを非表示
+                if (radioName) {
+                    hideErrorMessage(radioName + '-error');
+                }
+                
                 for (let radio of radioInputs) {
                     if (radio.checked) {
                         surveyData[radio.name] = radio.value;
@@ -1123,8 +1134,8 @@
                     }
                 }
                 
-                if (!isValid) {
-                    alert('選択肢を選んでください。');
+                if (!isValid && radioName) {
+                    showErrorMessage(radioName + '-error');
                     return;
                 }
             }
@@ -1150,7 +1161,13 @@
             // 最後の質問の回答を取得
             const currentCard = document.querySelector(`[data-question="${currentQuestion}"]`);
             const radioInputs = currentCard.querySelectorAll('input[type="radio"]');
+            const radioName = radioInputs[0]?.name;
             let isValid = false;
+            
+            // まずエラーメッセージを非表示
+            if (radioName) {
+                hideErrorMessage(radioName + '-error');
+            }
             
             for (let radio of radioInputs) {
                 if (radio.checked) {
@@ -1160,8 +1177,8 @@
                 }
             }
             
-            if (!isValid) {
-                alert('選択肢を選んでください。');
+            if (!isValid && radioName) {
+                showErrorMessage(radioName + '-error');
                 return;
             }
             
