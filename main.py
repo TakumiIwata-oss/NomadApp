@@ -468,20 +468,17 @@ def create_share_link():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('DEBUG', 'false').lower() == 'true'
     
     print(f"Starting Flask app on port {port}")
-    print("To use ngrok, set USE_NGROK=true environment variable")
-    print("To set ngrok auth token, set NGROK_AUTH_TOKEN environment variable")
-
-    print("client作成")
-    print(f"client: {client}")
     print(f"API Key設定状況: {'設定済み' if os.getenv('OPENAI_API_KEY') else '未設定'}")
     
-    # Only use ngrok if explicitly requested via environment variable
-    if os.environ.get('USE_NGROK') == 'true':
+    # 開発環境でのみngrokを使用
+    if debug and os.environ.get('USE_NGROK') == 'true':
+        print("To use ngrok, set USE_NGROK=true environment variable")
+        print("To set ngrok auth token, set NGROK_AUTH_TOKEN environment variable")
+        
         try:
             from pyngrok import ngrok
             
